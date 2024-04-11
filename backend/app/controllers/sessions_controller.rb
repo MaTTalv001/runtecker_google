@@ -6,20 +6,6 @@ class SessionsController < ApplicationController
     Rails.logger.info(frontend_url)
     # OmniAuthで提供される認証情報を取得
     user_info = request.env['omniauth.auth']
-    
-    # GitHubのユーザーIDを取得
-    github_user_id = user_info.uid
-    # 組織メンバー検索用にNicknameを取得（ネスト構造）
-    github_username = user_info.info.nickname
-    provider = "github"
-
-    # 組織メンバーかどうかをチェック
-    unless GithubOrgMemberCheckService.new(github_username: github_username).member?
-      Rails.logger.info("RunteqのGithubメンバーでない")
-      # 組織のメンバーでなければフロントのindexに遷移
-      redirect_to "#{frontend_url}/not_runtecker", allow_other_host: true
-      return
-    end
 
     # GitHubのユーザーIDを使ってトークンを生成
     token = generate_token_with_github_user_id(github_user_id, provider)
